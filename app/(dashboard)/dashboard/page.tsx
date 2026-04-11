@@ -99,16 +99,16 @@ export default function DashboardPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Link href="/dashboard/wallet" className="block group">
-          <Card className="transition-all hover:shadow-md hover:border-primary/30 cursor-pointer h-full">
+          <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/30 dark:border-slate-700/50 shadow-lg transition-all hover:shadow-xl hover:scale-[1.02] cursor-pointer h-full">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 text-primary">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 text-blue-600 dark:text-blue-400">
                     <Wallet className="w-6 h-6" />
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Balance</p>
-                    <p className="text-2xl font-bold text-foreground">${Number(user?.credits || 0).toFixed(2)}</p>
+                    <p className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">${Number(user?.credits || 0).toFixed(2)}</p>
                   </div>
                 </div>
                 <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -118,11 +118,11 @@ export default function DashboardPage() {
         </Link>
 
         <Link href="/dashboard/book" className="block group">
-          <Card className="transition-all hover:shadow-md hover:border-primary/30 cursor-pointer h-full">
+          <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/30 dark:border-slate-700/50 shadow-lg transition-all hover:shadow-xl hover:scale-[1.02] cursor-pointer h-full">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-accent/20 text-accent-foreground">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-green-500/20 to-green-600/20 text-green-600 dark:text-green-400">
                     <Car className="w-6 h-6" />
                   </div>
                   <div>
@@ -137,11 +137,11 @@ export default function DashboardPage() {
         </Link>
 
         <Link href="/dashboard/bookings" className="block group">
-          <Card className="transition-all hover:shadow-md hover:border-primary/30 cursor-pointer h-full">
+          <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/30 dark:border-slate-700/50 shadow-lg transition-all hover:shadow-xl hover:scale-[1.02] cursor-pointer h-full">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-secondary text-secondary-foreground">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-600/20 text-purple-600 dark:text-purple-400">
                     <Calendar className="w-6 h-6" />
                   </div>
                   <div>
@@ -164,7 +164,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       ) : activeBooking ? (
-        <Card className="border-primary/50 bg-primary/5">
+        <Card className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 backdrop-blur-xl border-blue-200/50 dark:border-blue-800/50 shadow-xl">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-primary">
@@ -202,13 +202,15 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/30 dark:border-slate-700/50 shadow-lg">
           <CardContent className="pt-6">
             <div className="text-center py-8">
-              <ParkingCircle className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center mx-auto mb-4">
+                <ParkingCircle className="w-8 h-8 text-muted-foreground" />
+              </div>
               <h3 className="text-lg font-medium text-foreground mb-2">No Active Parking</h3>
               <p className="text-muted-foreground mb-4">Start a new parking session</p>
-              <Button asChild>
+              <Button asChild className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-lg shadow-blue-500/25">
                 <Link href="/dashboard/book">
                   Book Parking <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
@@ -221,7 +223,7 @@ export default function DashboardPage() {
       {/* Alerts */}
       {alerts.length > 0 && (
         <Link href="/dashboard/alerts" className="block group">
-          <Card className="transition-all hover:shadow-md hover:border-primary/30 cursor-pointer">
+          <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/30 dark:border-slate-700/50 shadow-lg transition-all hover:shadow-xl hover:scale-[1.01] cursor-pointer">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -252,7 +254,7 @@ export default function DashboardPage() {
 
       {/* Recent Bookings */}
       <Link href="/dashboard/bookings" className="block group">
-        <Card className="transition-all hover:shadow-md hover:border-primary/30 cursor-pointer">
+        <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/30 dark:border-slate-700/50 shadow-lg transition-all hover:shadow-xl hover:scale-[1.01] cursor-pointer">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>

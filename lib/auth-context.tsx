@@ -23,6 +23,17 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+// Default guest user for direct dashboard access
+const guestUser: User = {
+  id: 0,
+  name: 'Guest User',
+  email: 'guest@smartparking.com',
+  role: 'user',
+  credits: 1000,
+  vehicle_number: 'GUEST-001',
+  phone: null
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
@@ -31,9 +42,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const res = await fetch('/api/auth/me')
       const data = await res.json()
-      setUser(data.user)
+      // If no authenticated user, use guest user for demo access
+      setUser(data.user || guestUser)
     } catch {
-      setUser(null)
+      // Allow guest access on error
+      setUser(guestUser)
     } finally {
       setLoading(false)
     }

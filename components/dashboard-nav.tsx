@@ -56,9 +56,9 @@ function NavContent({ onClose }: { onClose?: () => void }) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+      <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200/50 dark:border-slate-700/50">
         <Link href={user?.role === 'admin' ? '/admin' : '/dashboard'} className="flex items-center gap-3" onClick={onClose}>
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25">
             <Car className="w-5 h-5" />
           </div>
           <span className="font-semibold text-foreground text-lg">Smart Parking</span>
@@ -79,10 +79,10 @@ function NavContent({ onClose }: { onClose?: () => void }) {
               href={item.href}
               onClick={onClose}
               className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors",
+                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                 isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-secondary hover:text-secondary-foreground"
+                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25"
+                  : "text-muted-foreground hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-foreground"
               )}
             >
               <item.icon className="w-5 h-5" />
@@ -93,7 +93,7 @@ function NavContent({ onClose }: { onClose?: () => void }) {
       </nav>
 
       {user?.role === 'admin' && (
-        <div className="px-4 py-3 border-t border-border">
+        <div className="px-4 py-3 border-t border-slate-200/50 dark:border-slate-700/50">
           <Link
             href="/dashboard"
             onClick={onClose}
@@ -105,19 +105,19 @@ function NavContent({ onClose }: { onClose?: () => void }) {
         </div>
       )}
 
-      <div className="px-4 py-4 border-t border-border">
-        <div className="px-4 py-3 mb-3">
+      <div className="px-4 py-4 border-t border-slate-200/50 dark:border-slate-700/50">
+        <div className="px-4 py-3 mb-3 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-800/50">
           <p className="text-sm font-medium text-foreground truncate">{user?.name}</p>
           <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
           {user?.role !== 'admin' && (
-            <p className="text-xs text-primary font-medium mt-1">
+            <p className="text-xs font-semibold mt-1 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Balance: ${Number(user?.credits || 0).toFixed(2)}
             </p>
           )}
         </div>
         <Button
           variant="ghost"
-          className="w-full justify-start text-muted-foreground hover:text-destructive"
+          className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-red-50 dark:hover:bg-red-950/20"
           onClick={handleLogout}
         >
           <LogOut className="w-5 h-5 mr-3" />
@@ -134,10 +134,10 @@ export function DashboardNav() {
   return (
     <>
       {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-700/50">
         <div className="flex items-center justify-between px-4 h-16">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25">
               <Car className="w-4 h-4" />
             </div>
             <span className="font-semibold text-foreground">Smart Parking</span>
@@ -156,7 +156,7 @@ export function DashboardNav() {
       </header>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col bg-card border-r border-border">
+      <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-700/50">
         <NavContent />
       </aside>
 
