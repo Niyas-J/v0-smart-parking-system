@@ -112,12 +112,18 @@ export default function AdminOverviewPage() {
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Slot Distribution */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Slot Distribution</CardTitle>
-            <CardDescription>Current status of parking slots</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <Link href="/admin/slots" className="block group">
+          <Card className="transition-all hover:shadow-md hover:border-primary/30 cursor-pointer">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Slot Distribution</CardTitle>
+                  <CardDescription>Current status of parking slots</CardDescription>
+                </div>
+                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+            </CardHeader>
+            <CardContent>
             {loading ? (
               <Skeleton className="h-40 w-full" />
             ) : (
@@ -128,10 +134,10 @@ export default function AdminOverviewPage() {
                     : 0
                   
                   const colors: Record<string, string> = {
-                    available: 'bg-[oklch(var(--slot-available))]',
-                    occupied: 'bg-[oklch(var(--slot-occupied))]',
-                    reserved: 'bg-[oklch(var(--slot-reserved))]',
-                    maintenance: 'bg-[oklch(var(--slot-maintenance))]',
+                    available: 'bg-emerald-500',
+                    occupied: 'bg-rose-500',
+                    reserved: 'bg-blue-500',
+                    maintenance: 'bg-gray-500',
                   }
 
                   return (
@@ -153,18 +159,18 @@ export default function AdminOverviewPage() {
             )}
           </CardContent>
         </Card>
+        </Link>
 
         {/* Recent Bookings */}
-        <Card>
+        <Link href="/admin/bookings" className="block group">
+          <Card className="transition-all hover:shadow-md hover:border-primary/30 cursor-pointer">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle>Recent Bookings</CardTitle>
                 <CardDescription>Latest parking activity</CardDescription>
               </div>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/admin/bookings">View All</Link>
-              </Button>
+              <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
             </div>
           </CardHeader>
           <CardContent>
@@ -210,6 +216,7 @@ export default function AdminOverviewPage() {
             )}
           </CardContent>
         </Card>
+        </Link>
       </div>
     </div>
   )

@@ -13,7 +13,8 @@ import {
   Clock, 
   ArrowRight,
   Car,
-  Calendar
+  Calendar,
+  Bell
 } from 'lucide-react'
 import type { Booking, Alert } from '@/lib/db'
 
@@ -97,47 +98,62 @@ export default function DashboardPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 text-primary">
-                <Wallet className="w-6 h-6" />
+        <Link href="/dashboard/wallet" className="block group">
+          <Card className="transition-all hover:shadow-md hover:border-primary/30 cursor-pointer h-full">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 text-primary">
+                    <Wallet className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Balance</p>
+                    <p className="text-2xl font-bold text-foreground">${Number(user?.credits || 0).toFixed(2)}</p>
+                  </div>
+                </div>
+                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Balance</p>
-                <p className="text-2xl font-bold text-foreground">${Number(user?.credits || 0).toFixed(2)}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-accent/20 text-accent-foreground">
-                <Car className="w-6 h-6" />
+        <Link href="/dashboard/book" className="block group">
+          <Card className="transition-all hover:shadow-md hover:border-primary/30 cursor-pointer h-full">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-accent/20 text-accent-foreground">
+                    <Car className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Vehicle</p>
+                    <p className="text-2xl font-bold text-foreground">{user?.vehicle_number || 'Not set'}</p>
+                  </div>
+                </div>
+                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Vehicle</p>
-                <p className="text-2xl font-bold text-foreground">{user?.vehicle_number || 'Not set'}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-secondary text-secondary-foreground">
-                <Calendar className="w-6 h-6" />
+        <Link href="/dashboard/bookings" className="block group">
+          <Card className="transition-all hover:shadow-md hover:border-primary/30 cursor-pointer h-full">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-secondary text-secondary-foreground">
+                    <Calendar className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Bookings</p>
+                    <p className="text-2xl font-bold text-foreground">{recentBookings.length}</p>
+                  </div>
+                </div>
+                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total Bookings</p>
-                <p className="text-2xl font-bold text-foreground">{recentBookings.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       {/* Active Booking */}
@@ -204,45 +220,49 @@ export default function DashboardPage() {
 
       {/* Alerts */}
       {alerts.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Alerts</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {alerts.map((alert) => (
-                <div
-                  key={alert.id}
-                  className="flex items-start gap-3 p-3 rounded-lg bg-secondary/50"
-                >
-                  <div className="flex-1">
-                    <p className="font-medium text-foreground">{alert.title}</p>
-                    <p className="text-sm text-muted-foreground">{alert.message}</p>
-                  </div>
+        <Link href="/dashboard/alerts" className="block group">
+          <Card className="transition-all hover:shadow-md hover:border-primary/30 cursor-pointer">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Bell className="w-5 h-5 text-primary" />
+                  <CardTitle>Recent Alerts</CardTitle>
                 </div>
-              ))}
-            </div>
-            <Button variant="ghost" asChild className="w-full mt-4">
-              <Link href="/dashboard/alerts">View All Alerts</Link>
-            </Button>
-          </CardContent>
-        </Card>
+                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {alerts.map((alert) => (
+                  <div
+                    key={alert.id}
+                    className="flex items-start gap-3 p-3 rounded-lg bg-secondary/50"
+                  >
+                    <div className="flex-1">
+                      <p className="font-medium text-foreground">{alert.title}</p>
+                      <p className="text-sm text-muted-foreground">{alert.message}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
       )}
 
       {/* Recent Bookings */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Recent Bookings</CardTitle>
-              <CardDescription>Your parking history</CardDescription>
+      <Link href="/dashboard/bookings" className="block group">
+        <Card className="transition-all hover:shadow-md hover:border-primary/30 cursor-pointer">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Recent Bookings</CardTitle>
+                <CardDescription>Your parking history</CardDescription>
+              </div>
+              <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
             </div>
-            <Button variant="ghost" asChild>
-              <Link href="/dashboard/bookings">View All</Link>
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
+          </CardHeader>
+          <CardContent>
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
@@ -291,8 +311,9 @@ export default function DashboardPage() {
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </Link>
     </div>
   )
 }
