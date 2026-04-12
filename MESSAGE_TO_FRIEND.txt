@@ -1,0 +1,21 @@
+Hey! I fixed the authentication issue in the parking system project. 
+
+The problem was the database was missing the password_hash column, so users could bypass login. I've fixed it and pushed everything to GitHub.
+
+To deploy:
+
+1. Go to vercel.com/dashboard
+2. Click "Add New" → "Project"
+3. Import the v0-smart-parking-system repo
+4. Add these environment variables:
+   - DATABASE_URL: postgresql://neondb_owner:npg_cfjiJK5D1nlu@ep-spring-hat-annsp0tx.c-6.us-east-1.aws.neon.tech/neondb?sslmode=require
+   - GUEST_USER_ID: 2
+5. Click Deploy
+
+After deployment, test login with:
+- Admin: admin@parking.com / admin123
+- User: john@example.com / user123
+
+Full instructions are in DEPLOY_INSTRUCTIONS.md in the repo.
+
+Let me know if you need help!

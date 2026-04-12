@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { AuthProvider } from '@/lib/auth-context'
 import { requireAuth } from '@/lib/auth'
+import { DashboardNav } from '@/components/dashboard-nav'
 
 export default async function BookLayout({ children }: { children: React.ReactNode }) {
   try {
@@ -9,5 +10,14 @@ export default async function BookLayout({ children }: { children: React.ReactNo
     redirect('/login')
   }
 
-  return <AuthProvider>{children}</AuthProvider>
+  return (
+    <AuthProvider>
+      <DashboardNav />
+      <main className="lg:pl-72">
+        <div className="px-4 py-8 sm:px-6 lg:px-8">
+          {children}
+        </div>
+      </main>
+    </AuthProvider>
+  )
 }
