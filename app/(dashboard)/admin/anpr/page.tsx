@@ -32,6 +32,7 @@ export default function ANPRPage() {
   const [recentScans, setRecentScans] = useState<ScanResult[]>([])
   const [cameraActive, setCameraActive] = useState(false)
   const [ocrLoading, setOcrLoading] = useState(false)
+  const [videoReady, setVideoReady] = useState(false)
   
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -39,6 +40,9 @@ export default function ANPRPage() {
 
   const startCamera = async () => {
     try {
+      setVideoReady(false)
+      toast.info('Starting camera...')
+      
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
           facingMode: 'environment',
@@ -46,16 +50,27 @@ export default function ANPRPage() {
           height: { ideal: 720 }
         } 
       })
+      
       if (videoRef.current) {
         videoRef.current.srcObject = stream
-        await videoRef.current.play()
         streamRef.current = stream
         setCameraActive(true)
-        toast.success('Camera started')
+        
+        // Wait for video to be ready
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play().then(() => {
+            setVideoReady(true)
+            toast.success('Camera ready!')
+          }).catch(err => {
+            console.error('Play error:', err)
+            toast.error('Failed to start video')
+          })
+        }
       }
-    } catch (error) {
-      toast.error('Failed to access camera. Please check permissions.')
+    } catch (error: any) {
+      toast.error('Camera access denied: ' + error.message)
       console.error('Camera error:', error)
+      setCameraActive(false)
     }
   }
 
@@ -64,6 +79,10 @@ export default function ANPRPage() {
       streamRef.current.getTracks().forEach(track => track.stop())
       streamRef.current = null
       setCameraActive(false)
+      setVideoReady(false)
+      if (videoRef.current) {
+        videoRef.current.srcObject = null
+      }
     }
   }
 
@@ -197,23 +216,29 @@ export default function ANPRPage() {
           <CardContent className="space-y-4">
             {cameraActive && (
               <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+                {!videoReady && (
+                  <div className="absolute inset-0 flex items-center justify-center text-white">
+                    <div className="text-center">
+                      <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
+                      <p>Loading camera...</p>
+                    </div>
+                  </div>
+                )}
                 <video
                   ref={videoRef}
                   autoPlay
                   playsInline
                   muted
                   className="w-full h-full object-cover"
-                  onLoadedMetadata={() => {
-                    if (videoRef.current) {
-                      videoRef.current.play().catch(e => console.error('Play error:', e))
-                    }
-                  }}
+                  style={{ display: videoReady ? 'block' : 'none' }}
                 />
-                <div className="absolute inset-0 border-2 border-primary/50 m-8 rounded-lg pointer-events-none">
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white bg-black/50 px-3 py-1 rounded text-sm">
-                    Position plate here
+                {videoReady && (
+                  <div className="absolute inset-0 border-2 border-primary/50 m-8 rounded-lg pointer-events-none">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white bg-black/50 px-3 py-1 rounded text-sm">
+                      Position plate here
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
@@ -244,8 +269,8 @@ export default function ANPRPage() {
 
               {cameraActive && (
                 <>
-                  <Button onClick={captureImage} className="flex-1">
-                    Capture Image
+                  <Button onClick={captureImage} className="flex-1" disabled={!videoReady}>
+                    {videoReady ? 'Capture Image' : 'Loading...'}
                   </Button>
                   <Button onClick={stopCamera} variant="outline">
                     Cancel
