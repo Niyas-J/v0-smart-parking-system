@@ -26,20 +26,7 @@ import type { Slot, Booking } from '@/lib/db'
 import type { ParkingZone } from '@/lib/slot-zone'
 import { cn } from '@/lib/utils'
 
-const ParkingLot3D = dynamic(
-  () => import('@/components/parking-lot-3d').then((m) => m.ParkingLot3D),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex h-[min(520px,70vh)] items-center justify-center rounded-2xl border border-white/10 bg-slate-950/60">
-        <div className="relative">
-          <div className="h-12 w-12 animate-spin rounded-full border-2 border-cyan-400/30 border-t-cyan-400" />
-          <Sparkles className="absolute inset-0 m-auto h-5 w-5 text-cyan-300/80 animate-pulse" />
-        </div>
-      </div>
-    ),
-  },
-)
+import { ParkingLot2D } from '@/components/parking-lot-2d'
 
 type SlotRow = Slot & { zone?: string | null }
 
@@ -320,7 +307,7 @@ export function BookParkingContent({ afterBookPath = '/dashboard' }: { afterBook
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-xl">
                     <Sparkles className="h-5 w-5 text-cyan-400" />
-                    Live 3D deck
+                    Live 2D Map
                   </CardTitle>
                   <CardDescription>
                     Available bays pulse green. Occupied or reserved glow red with a vehicle mesh. Tap a green bay
@@ -330,10 +317,10 @@ export function BookParkingContent({ afterBookPath = '/dashboard' }: { afterBook
                 <CardContent>
                   {loading || zoneLoading ? (
                     <div className="space-y-3">
-                      <Skeleton className="h-[min(520px,70vh)] w-full rounded-2xl" />
+                      <Skeleton className="h-64 w-full rounded-2xl" />
                     </div>
                   ) : (
-                    <ParkingLot3D
+                    <ParkingLot2D
                       slots={slots}
                       selectedSlot={selectedSlot}
                       onSelectSlot={(s) => setSelectedSlot(s)}
