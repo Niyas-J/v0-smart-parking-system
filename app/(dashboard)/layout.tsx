@@ -12,7 +12,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login')
+      router.push('/book')
     }
   }, [user, loading, router])
 

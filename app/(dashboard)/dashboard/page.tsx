@@ -178,7 +178,7 @@ export default function DashboardPage() {
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <Link href="/dashboard/book" className="block group">
+          <Link href="/book" className="block group">
             <Card className="glass-panel float-card h-full cursor-pointer border-white/10 transition-all duration-300 hover:border-primary/30">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
@@ -369,7 +369,7 @@ export default function DashboardPage() {
                 asChild
                 className="rounded-xl shadow-[0_0_36px_-8px_color-mix(in_oklch,var(--primary)_45%,transparent)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
               >
-                <Link href="/dashboard/book">
+                <Link href="/book">
                   Book parking <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

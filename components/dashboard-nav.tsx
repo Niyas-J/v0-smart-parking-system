@@ -26,7 +26,7 @@ import {
 
 const userNavItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/dashboard/book', label: 'Book Parking', icon: ParkingCircle },
+  { href: '/book', label: 'Book Parking', icon: ParkingCircle },
   { href: '/dashboard/bookings', label: 'My Bookings', icon: CalendarDays },
   { href: '/dashboard/wallet', label: 'Wallet', icon: Wallet },
   { href: '/dashboard/alerts', label: 'Alerts', icon: Bell },
@@ -51,7 +51,7 @@ function NavContent({ onClose }: { onClose?: () => void }) {
 
   const handleLogout = async () => {
     await logout()
-    router.push('/login')
+    router.push('/book')
   }
 
   return (
