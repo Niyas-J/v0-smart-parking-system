@@ -79,10 +79,10 @@ function NavContent({ onClose }: { onClose?: () => void }) {
               href={item.href}
               onClick={onClose}
               className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors",
+                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300",
                 isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-secondary hover:text-secondary-foreground"
+                  ? "bg-primary text-primary-foreground shadow-[0_0_28px_-8px_color-mix(in_oklch,var(--primary)_55%,transparent)]"
+                  : "text-muted-foreground hover:bg-secondary/80 hover:text-secondary-foreground hover:translate-x-0.5"
               )}
             >
               <item.icon className="w-5 h-5" />
@@ -134,7 +134,7 @@ export function DashboardNav() {
   return (
     <>
       {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-background/65 backdrop-blur-xl supports-[backdrop-filter]:bg-background/45">
         <div className="flex items-center justify-between px-4 h-16">
           <Link href="/dashboard" className="flex items-center gap-2">
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground">
@@ -156,7 +156,7 @@ export function DashboardNav() {
       </header>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col bg-card border-r border-border">
+      <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col border-r border-white/10 bg-card/75 backdrop-blur-xl supports-[backdrop-filter]:bg-card/55">
         <NavContent />
       </aside>
 

@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { toast } from 'sonner'
 import { Plus, Pencil, Trash2, ParkingCircle } from 'lucide-react'
 import type { Slot } from '@/lib/db'
+import { inferParkingZone } from '@/lib/slot-zone'
 
 const statusColors: Record<string, 'default' | 'secondary' | 'outline' | 'destructive'> = {
   available: 'default',
@@ -30,6 +31,7 @@ export default function AdminSlotsPage() {
     slot_number: '',
     floor: '1',
     slot_type: 'standard',
+    zone: 'car' as 'bike' | 'car' | 'suv',
     status: 'available',
     hourly_rate: '2.00',
   })
@@ -57,6 +59,7 @@ export default function AdminSlotsPage() {
       slot_number: '',
       floor: '1',
       slot_type: 'standard',
+      zone: 'car',
       status: 'available',
       hourly_rate: '2.00',
     })
@@ -69,6 +72,7 @@ export default function AdminSlotsPage() {
       slot_number: slot.slot_number,
       floor: String(slot.floor),
       slot_type: slot.slot_type,
+      zone: inferParkingZone(slot),
       status: slot.status,
       hourly_rate: String(slot.hourly_rate),
     })
@@ -87,6 +91,7 @@ export default function AdminSlotsPage() {
         slot_number: formData.slot_number,
         floor: parseInt(formData.floor),
         slot_type: formData.slot_type,
+        zone: formData.zone,
         status: formData.status,
         hourly_rate: parseFloat(formData.hourly_rate),
       }
@@ -176,20 +181,38 @@ export default function AdminSlotsPage() {
                   </Select>
                 </Field>
                 <Field>
-                  <FieldLabel>Type</FieldLabel>
-                  <Select value={formData.slot_type} onValueChange={(v) => setFormData({ ...formData, slot_type: v })}>
+                  <FieldLabel>Zone</FieldLabel>
+                  <Select
+                    value={formData.zone}
+                    onValueChange={(v) =>
+                      setFormData({ ...formData, zone: v as 'bike' | 'car' | 'suv' })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="standard">Standard</SelectItem>
-                      <SelectItem value="handicapped">Handicapped</SelectItem>
-                      <SelectItem value="ev">EV Charging</SelectItem>
-                      <SelectItem value="vip">VIP</SelectItem>
+                      <SelectItem value="bike">Bike</SelectItem>
+                      <SelectItem value="car">Car</SelectItem>
+                      <SelectItem value="suv">SUV</SelectItem>
                     </SelectContent>
                   </Select>
                 </Field>
               </div>
+              <Field>
+                <FieldLabel>Slot type</FieldLabel>
+                <Select value={formData.slot_type} onValueChange={(v) => setFormData({ ...formData, slot_type: v })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="standard">Standard</SelectItem>
+                    <SelectItem value="handicapped">Handicapped</SelectItem>
+                    <SelectItem value="ev">EV Charging</SelectItem>
+                    <SelectItem value="vip">VIP</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
               <div className="grid grid-cols-2 gap-4">
                 <Field>
                   <FieldLabel>Status</FieldLabel>
@@ -249,6 +272,7 @@ export default function AdminSlotsPage() {
                   <TableRow>
                     <TableHead>Slot</TableHead>
                     <TableHead>Floor</TableHead>
+                    <TableHead>Zone</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Rate</TableHead>
@@ -260,6 +284,7 @@ export default function AdminSlotsPage() {
                     <TableRow key={slot.id}>
                       <TableCell className="font-medium">{slot.slot_number}</TableCell>
                       <TableCell>{slot.floor}</TableCell>
+                      <TableCell className="capitalize">{inferParkingZone(slot)}</TableCell>
                       <TableCell className="capitalize">{slot.slot_type}</TableCell>
                       <TableCell>
                         <Badge variant={statusColors[slot.status]}>{slot.status}</Badge>

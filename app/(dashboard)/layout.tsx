@@ -18,8 +18,11 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Spinner className="w-8 h-8 text-primary" />
+      <div className="flex min-h-screen items-center justify-center ambient-app-bg">
+        <div className="relative">
+          <Spinner className="h-10 w-10 text-primary" />
+          <div className="absolute inset-0 animate-ping rounded-full border-2 border-primary/20" />
+        </div>
       </div>
     )
   }
@@ -29,12 +32,10 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen ambient-app-bg">
       <DashboardNav />
       <main className="lg:pl-72">
-        <div className="px-4 sm:px-6 lg:px-8 py-8">
-          {children}
-        </div>
+        <div className="px-4 py-8 sm:px-6 lg:px-10">{children}</div>
       </main>
     </div>
   )

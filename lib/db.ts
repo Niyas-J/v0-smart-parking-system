@@ -23,6 +23,8 @@ export interface Slot {
   slot_number: string
   floor: number
   slot_type: 'standard' | 'handicapped' | 'ev' | 'vip'
+  /** Vehicle class zone for multi-deck UX (optional in DB; inferred when missing). */
+  zone?: 'bike' | 'car' | 'suv' | string | null
   status: 'available' | 'occupied' | 'reserved' | 'maintenance'
   hourly_rate: number
   created_at: Date
@@ -83,6 +85,7 @@ export interface Alert {
   message: string
   is_read: boolean
   created_at: Date
+  image_url?: string | null
 }
 
 export interface Ticket {
