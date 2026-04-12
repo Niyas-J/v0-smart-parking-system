@@ -37,6 +37,7 @@ const userNavItems = [
 
 const adminNavItems = [
   { href: '/admin', label: 'Overview', icon: BarChart3 },
+  { href: '/admin/anpr', label: 'ANPR System', icon: Car },
   { href: '/admin/slots', label: 'Manage Slots', icon: ParkingCircle },
   { href: '/admin/bookings', label: 'All Bookings', icon: CalendarDays },
   { href: '/admin/users', label: 'Users', icon: Users },
