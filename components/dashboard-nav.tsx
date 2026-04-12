@@ -21,7 +21,8 @@ import {
   CreditCard,
   TicketIcon,
   BarChart3,
-  X
+  X,
+  Mail
 } from 'lucide-react'
 
 const userNavItems = [
@@ -31,6 +32,7 @@ const userNavItems = [
   { href: '/dashboard/wallet', label: 'Wallet', icon: Wallet },
   { href: '/dashboard/alerts', label: 'Alerts', icon: Bell },
   { href: '/dashboard/support', label: 'Support', icon: HelpCircle },
+  { href: '/contact', label: 'Contact', icon: Mail },
 ]
 
 const adminNavItems = [
@@ -40,6 +42,7 @@ const adminNavItems = [
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/topups', label: 'Top-ups', icon: CreditCard },
   { href: '/admin/tickets', label: 'Tickets', icon: TicketIcon },
+  { href: '/contact', label: 'Contact', icon: Mail },
 ]
 
 function NavContent({ onClose }: { onClose?: () => void }) {
