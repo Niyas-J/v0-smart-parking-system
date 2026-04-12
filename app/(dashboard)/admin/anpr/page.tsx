@@ -40,15 +40,21 @@ export default function ANPRPage() {
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' }
+        video: { 
+          facingMode: 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        } 
       })
       if (videoRef.current) {
         videoRef.current.srcObject = stream
+        await videoRef.current.play()
         streamRef.current = stream
         setCameraActive(true)
+        toast.success('Camera started')
       }
     } catch (error) {
-      toast.error('Failed to access camera')
+      toast.error('Failed to access camera. Please check permissions.')
       console.error('Camera error:', error)
     }
   }
@@ -195,10 +201,16 @@ export default function ANPRPage() {
                   ref={videoRef}
                   autoPlay
                   playsInline
+                  muted
                   className="w-full h-full object-cover"
+                  onLoadedMetadata={() => {
+                    if (videoRef.current) {
+                      videoRef.current.play().catch(e => console.error('Play error:', e))
+                    }
+                  }}
                 />
                 <div className="absolute inset-0 border-2 border-primary/50 m-8 rounded-lg pointer-events-none">
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary/70 text-sm">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white bg-black/50 px-3 py-1 rounded text-sm">
                     Position plate here
                   </div>
                 </div>
