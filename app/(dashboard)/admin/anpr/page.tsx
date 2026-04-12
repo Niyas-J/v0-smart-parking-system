@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Camera, CheckCircle, XCircle, Loader2, RefreshCw, User, DollarSign } from 'lucide-react'
+import { Camera, CheckCircle, XCircle, Loader2, RefreshCw, User, DollarSign, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface ScanResult {
@@ -32,62 +32,77 @@ export default function ANPRPage() {
   const [recentScans, setRecentScans] = useState<ScanResult[]>([])
   const [cameraActive, setCameraActive] = useState(false)
   const [ocrLoading, setOcrLoading] = useState(false)
-  const [videoReady, setVideoReady] = useState(false)
+  const [cameraError, setCameraError] = useState('')
   
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
   const startCamera = async () => {
+    setCameraError('')
+    setCameraActive(false)
+    
     try {
-      setVideoReady(false)
-      toast.info('Starting camera...')
+      console.log('Requesting camera access...')
       
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
+      // Stop any existing stream first
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop())
+      }
+
+      const constraints = {
+        video: {
           facingMode: 'environment',
           width: { ideal: 1280 },
           height: { ideal: 720 }
-        } 
-      })
+        }
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints)
+      console.log('Camera stream obtained:', stream)
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream
         streamRef.current = stream
-        setCameraActive(true)
         
-        // Wait for video to be ready
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play().then(() => {
-            setVideoReady(true)
-            toast.success('Camera ready!')
-          }).catch(err => {
-            console.error('Play error:', err)
-            toast.error('Failed to start video')
-          })
+        // Force play
+        try {
+          await videoRef.current.play()
+          console.log('Video playing')
+          setCameraActive(true)
+          toast.success('Camera started!')
+        } catch (playError) {
+          console.error('Play error:', playError)
+          setCameraError('Failed to play video: ' + playError)
         }
       }
     } catch (error: any) {
-      toast.error('Camera access denied: ' + error.message)
       console.error('Camera error:', error)
-      setCameraActive(false)
+      setCameraError(error.message || 'Failed to access camera')
+      toast.error('Camera error: ' + error.message)
     }
   }
 
   const stopCamera = () => {
+    console.log('Stopping camera')
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop())
+      streamRef.current.getTracks().forEach(track => {
+        track.stop()
+        console.log('Track stopped:', track.kind)
+      })
       streamRef.current = null
-      setCameraActive(false)
-      setVideoReady(false)
-      if (videoRef.current) {
-        videoRef.current.srcObject = null
-      }
     }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null
+    }
+    setCameraActive(false)
   }
 
   const captureImage = () => {
-    if (!videoRef.current || !canvasRef.current) return
+    if (!videoRef.current || !canvasRef.current) {
+      toast.error('Video not ready')
+      return
+    }
 
     const video = videoRef.current
     const canvas = canvasRef.current
@@ -95,13 +110,20 @@ export default function ANPRPage() {
 
     if (!context) return
 
+    // Check if video has dimensions
+    if (video.videoWidth === 0 || video.videoHeight === 0) {
+      toast.error('Video not loaded yet')
+      return
+    }
+
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
     context.drawImage(video, 0, 0)
 
-    const imageData = canvas.toDataURL('image/jpeg')
+    const imageData = canvas.toDataURL('image/jpeg', 0.9)
     setCapturedImage(imageData)
     stopCamera()
+    toast.success('Image captured!')
     
     runOCR(imageData)
   }
@@ -112,6 +134,8 @@ export default function ANPRPage() {
     
     try {
       const Tesseract = await import('tesseract.js')
+      
+      toast.info('Processing image...')
       
       const { data } = await Tesseract.recognize(imageData, 'eng', {
         logger: (m) => {
@@ -125,6 +149,9 @@ export default function ANPRPage() {
         .toUpperCase()
         .replace(/[^A-Z0-9]/g, '')
         .trim()
+
+      console.log('OCR Result:', data.text)
+      console.log('Cleaned plate:', plate)
 
       if (plate.length >= 5) {
         setExtractedPlate(plate)
@@ -189,6 +216,7 @@ export default function ANPRPage() {
     setExtractedPlate('')
     setManualPlate('')
     setValidationResult(null)
+    setCameraError('')
   }
 
   useEffect(() => {
@@ -214,54 +242,68 @@ export default function ANPRPage() {
             <CardDescription>Capture vehicle number plate</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Camera Error */}
+            {cameraError && (
+              <Alert variant="destructive">
+                <AlertCircle className="w-4 h-4" />
+                <AlertDescription>{cameraError}</AlertDescription>
+              </Alert>
+            )}
+
+            {/* Video Preview */}
             {cameraActive && (
               <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
-                {!videoReady && (
-                  <div className="absolute inset-0 flex items-center justify-center text-white">
-                    <div className="text-center">
-                      <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
-                      <p>Loading camera...</p>
-                    </div>
-                  </div>
-                )}
                 <video
                   ref={videoRef}
                   autoPlay
                   playsInline
                   muted
                   className="w-full h-full object-cover"
-                  style={{ display: videoReady ? 'block' : 'none' }}
+                  onLoadedMetadata={() => {
+                    console.log('Video metadata loaded')
+                    console.log('Video dimensions:', videoRef.current?.videoWidth, 'x', videoRef.current?.videoHeight)
+                  }}
+                  onPlay={() => console.log('Video playing event')}
+                  onError={(e) => {
+                    console.error('Video error:', e)
+                    setCameraError('Video playback error')
+                  }}
                 />
-                {videoReady && (
-                  <div className="absolute inset-0 border-2 border-primary/50 m-8 rounded-lg pointer-events-none">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white bg-black/50 px-3 py-1 rounded text-sm">
-                      Position plate here
-                    </div>
+                <div className="absolute inset-0 border-2 border-green-500/50 m-8 rounded-lg pointer-events-none">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white bg-black/70 px-4 py-2 rounded text-sm font-medium">
+                    Position plate here
                   </div>
-                )}
+                </div>
+                <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
+                  LIVE
+                </div>
               </div>
             )}
 
+            {/* Captured Image */}
             {capturedImage && !cameraActive && (
               <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
                 <img src={capturedImage} alt="Captured" className="w-full h-full object-cover" />
               </div>
             )}
 
+            {/* Placeholder */}
             {!cameraActive && !capturedImage && (
-              <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+              <div className="aspect-video bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-border">
                 <div className="text-center text-muted-foreground">
                   <Camera className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                  <p>Camera preview will appear here</p>
+                  <p className="font-medium">Camera preview will appear here</p>
+                  <p className="text-xs mt-1">Click "Start Camera" to begin</p>
                 </div>
               </div>
             )}
 
             <canvas ref={canvasRef} className="hidden" />
 
+            {/* Camera Controls */}
             <div className="flex gap-2">
               {!cameraActive && !capturedImage && (
-                <Button onClick={startCamera} className="flex-1">
+                <Button onClick={startCamera} className="flex-1" size="lg">
                   <Camera className="w-4 h-4 mr-2" />
                   Start Camera
                 </Button>
@@ -269,37 +311,40 @@ export default function ANPRPage() {
 
               {cameraActive && (
                 <>
-                  <Button onClick={captureImage} className="flex-1" disabled={!videoReady}>
-                    {videoReady ? 'Capture Image' : 'Loading...'}
+                  <Button onClick={captureImage} className="flex-1" size="lg">
+                    <Camera className="w-4 h-4 mr-2" />
+                    Capture Image
                   </Button>
-                  <Button onClick={stopCamera} variant="outline">
+                  <Button onClick={stopCamera} variant="outline" size="lg">
                     Cancel
                   </Button>
                 </>
               )}
 
               {capturedImage && (
-                <Button onClick={resetScan} variant="outline" className="flex-1">
+                <Button onClick={resetScan} variant="outline" className="flex-1" size="lg">
                   <RefreshCw className="w-4 h-4 mr-2" />
                   New Scan
                 </Button>
               )}
             </div>
 
+            {/* OCR Progress */}
             {ocrLoading && (
               <Alert>
                 <Loader2 className="w-4 h-4 animate-spin" />
                 <AlertDescription>
-                  Processing image with OCR...
+                  Processing image with OCR... This may take 10-15 seconds.
                 </AlertDescription>
               </Alert>
             )}
 
+            {/* Extracted Plate */}
             {extractedPlate && !ocrLoading && (
-              <Alert>
+              <Alert className="border-green-500 bg-green-500/10">
                 <CheckCircle className="w-4 h-4 text-green-500" />
                 <AlertDescription>
-                  Detected Plate: <strong>{extractedPlate}</strong>
+                  Detected Plate: <strong className="text-lg">{extractedPlate}</strong>
                 </AlertDescription>
               </Alert>
             )}
@@ -325,6 +370,7 @@ export default function ANPRPage() {
                 <Button
                   onClick={() => validatePlate(manualPlate)}
                   disabled={isScanning || !manualPlate}
+                  size="lg"
                 >
                   {isScanning ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
