@@ -5,9 +5,11 @@ CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
-  credits INTEGER DEFAULT 1000,
+  password_hash VARCHAR(255) NOT NULL,
+  credits DECIMAL(10, 2) DEFAULT 1000.00,
   role VARCHAR(50) DEFAULT 'user',
-  is_blocked BOOLEAN DEFAULT FALSE,
+  vehicle_number VARCHAR(50),
+  phone VARCHAR(50),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -17,8 +19,10 @@ CREATE TABLE IF NOT EXISTS slots (
   id SERIAL PRIMARY KEY,
   slot_number VARCHAR(10) NOT NULL UNIQUE,
   floor INTEGER DEFAULT 1,
-  slot_type VARCHAR(50) DEFAULT 'car',
-  is_available BOOLEAN DEFAULT TRUE,
+  slot_type VARCHAR(50) DEFAULT 'standard',
+  zone VARCHAR(50),
+  status VARCHAR(50) DEFAULT 'available',
+  hourly_rate DECIMAL(10, 2) DEFAULT 5.00,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -27,24 +31,24 @@ CREATE TABLE IF NOT EXISTS bookings (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
   slot_id INTEGER REFERENCES slots(id) ON DELETE CASCADE,
-  vehicle_type VARCHAR(50) NOT NULL,
-  number_plate VARCHAR(20) NOT NULL,
-  duration_hours INTEGER NOT NULL,
-  total_cost INTEGER NOT NULL,
-  status VARCHAR(50) DEFAULT 'active',
+  vehicle_number VARCHAR(50) NOT NULL,
   start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   end_time TIMESTAMP,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  status VARCHAR(50) DEFAULT 'active',
+  total_cost DECIMAL(10, 2) DEFAULT 0.00,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Transactions table (credit history)
 CREATE TABLE IF NOT EXISTS transactions (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-  amount INTEGER NOT NULL,
-  transaction_type VARCHAR(50) NOT NULL,
+  booking_id INTEGER REFERENCES bookings(id) ON DELETE SET NULL,
+  type VARCHAR(50) NOT NULL,
+  amount DECIMAL(10, 2) NOT NULL,
+  balance_after DECIMAL(10, 2) NOT NULL,
   description TEXT,
-  status VARCHAR(50) DEFAULT 'completed',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -52,21 +56,25 @@ CREATE TABLE IF NOT EXISTS transactions (
 CREATE TABLE IF NOT EXISTS topup_requests (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-  amount INTEGER NOT NULL,
+  amount DECIMAL(10, 2) NOT NULL,
   status VARCHAR(50) DEFAULT 'pending',
+  payment_method VARCHAR(100),
+  proof_url TEXT,
   admin_notes TEXT,
+  processed_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   processed_at TIMESTAMP
 );
 
--- Alerts table (security alerts)
+-- Alerts table
 CREATE TABLE IF NOT EXISTS alerts (
   id SERIAL PRIMARY KEY,
-  number_plate VARCHAR(20) NOT NULL,
-  vehicle_image TEXT,
-  alert_type VARCHAR(50) DEFAULT 'suspicious',
-  status VARCHAR(50) DEFAULT 'pending',
-  description TEXT,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  type VARCHAR(50) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  message TEXT NOT NULL,
+  image_url TEXT,
+  is_read BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -75,55 +83,49 @@ CREATE TABLE IF NOT EXISTS tickets (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
   subject VARCHAR(255) NOT NULL,
-  description TEXT NOT NULL,
+  message TEXT NOT NULL,
   status VARCHAR(50) DEFAULT 'open',
-  priority VARCHAR(50) DEFAULT 'medium',
+  priority VARCHAR(50) DEFAULT 'normal',
   admin_response TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Seed default admin user
-INSERT INTO users (name, email, credits, role) 
-VALUES ('Admin', 'admin@parking.com', 10000, 'admin')
+-- Seed default admin user (password: admin123)
+INSERT INTO users (name, email, password_hash, credits, role) 
+VALUES ('Admin', 'admin@parking.com', '$2b$10$CGrIHwvcmJGZGWqq83hAsONNviu67RJRQp9BtsPdgyv.f1E2LBow.', 10000.00, 'admin')
 ON CONFLICT (email) DO NOTHING;
 
--- Seed default user
-INSERT INTO users (name, email, credits, role) 
-VALUES ('John Doe', 'john@example.com', 1000, 'user')
+-- Seed default user (password: user123)
+INSERT INTO users (name, email, password_hash, credits, role, vehicle_number) 
+VALUES ('John Doe', 'john@example.com', '$2b$10$/5YTgovhWerE17dhPhazIuqy4O1tgzBzmlzsX3SxZR6lHlBhg4kmu', 1000.00, 'user', 'ABC-1234')
 ON CONFLICT (email) DO NOTHING;
 
 -- Seed parking slots (20 slots across 2 floors)
-INSERT INTO slots (slot_number, floor, slot_type, is_available) VALUES
-('A1', 1, 'car', TRUE),
-('A2', 1, 'car', TRUE),
-('A3', 1, 'car', TRUE),
-('A4', 1, 'car', TRUE),
-('A5', 1, 'suv', TRUE),
-('B1', 1, 'bike', TRUE),
-('B2', 1, 'bike', TRUE),
-('B3', 1, 'bike', TRUE),
-('B4', 1, 'bike', TRUE),
-('B5', 1, 'car', TRUE),
-('C1', 2, 'car', TRUE),
-('C2', 2, 'car', TRUE),
-('C3', 2, 'suv', TRUE),
-('C4', 2, 'suv', TRUE),
-('C5', 2, 'car', TRUE),
-('D1', 2, 'bike', TRUE),
-('D2', 2, 'bike', TRUE),
-('D3', 2, 'car', TRUE),
-('D4', 2, 'car', TRUE),
-('D5', 2, 'suv', TRUE)
+INSERT INTO slots (slot_number, floor, slot_type, zone, status, hourly_rate) VALUES
+('A1', 1, 'standard', 'car', 'available', 5.00),
+('A2', 1, 'standard', 'car', 'available', 5.00),
+('A3', 1, 'standard', 'car', 'available', 5.00),
+('A4', 1, 'vip', 'car', 'available', 10.00),
+('A5', 1, 'standard', 'suv', 'available', 7.00),
+('B1', 1, 'standard', 'bike', 'available', 2.00),
+('B2', 1, 'standard', 'bike', 'available', 2.00),
+('B3', 1, 'standard', 'bike', 'available', 2.00),
+('B4', 1, 'standard', 'bike', 'available', 2.00),
+('B5', 1, 'ev', 'car', 'available', 8.00),
+('C1', 2, 'standard', 'car', 'available', 5.00),
+('C2', 2, 'standard', 'car', 'available', 5.00),
+('C3', 2, 'standard', 'suv', 'available', 7.00),
+('C4', 2, 'handicapped', 'suv', 'available', 5.00),
+('C5', 2, 'standard', 'car', 'available', 5.00),
+('D1', 2, 'standard', 'bike', 'available', 2.00),
+('D2', 2, 'standard', 'bike', 'available', 2.00),
+('D3', 2, 'standard', 'car', 'available', 5.00),
+('D4', 2, 'vip', 'car', 'available', 10.00),
+('D5', 2, 'standard', 'suv', 'available', 7.00)
 ON CONFLICT (slot_number) DO NOTHING;
 
--- Seed some sample alerts
-INSERT INTO alerts (number_plate, alert_type, status, description) VALUES
-('ABC-1234', 'suspicious', 'pending', 'Vehicle entered without valid booking'),
-('XYZ-9876', 'unauthorized', 'resolved', 'Attempted entry with expired pass')
-ON CONFLICT DO NOTHING;
-
 -- Seed sample support ticket
-INSERT INTO tickets (user_id, subject, description, status, priority) VALUES
+INSERT INTO tickets (user_id, subject, message, status, priority) VALUES
 (2, 'Cannot book parking', 'I am unable to select a parking slot for my vehicle.', 'open', 'high')
 ON CONFLICT DO NOTHING;

@@ -1,5 +1,13 @@
+import { redirect } from 'next/navigation'
 import { AuthProvider } from '@/lib/auth-context'
+import { requireAuth } from '@/lib/auth'
 
-export default function BookLayout({ children }: { children: React.ReactNode }) {
+export default async function BookLayout({ children }: { children: React.ReactNode }) {
+  try {
+    await requireAuth()
+  } catch {
+    redirect('/login')
+  }
+
   return <AuthProvider>{children}</AuthProvider>
 }
