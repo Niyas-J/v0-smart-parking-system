@@ -43,11 +43,32 @@ export async function POST(req: Request) {
       })
     } else {
       // Not Authorized - Gate Closed
-      // Store alert in DB with base64 snippet of image
-      const base64Image = `data:image/jpeg;base64,${buffer.toString('base64')}`
+      let imageUrl = null
+
+      try {
+        const { bucket } = await import('@/lib/firebase-admin')
+        if (bucket) {
+          // Upload to Firebase Storage
+          const fileName = `alerts/${Date.now()}-${detectedPlate}.jpg`
+          const file = bucket.file(fileName)
+          
+          await file.save(buffer, {
+            metadata: { contentType: 'image/jpeg' },
+          })
+          
+          const [signedUrl] = await file.getSignedUrl({ action: 'read', expires: '01-01-2099' })
+          imageUrl = signedUrl
+        } else {
+          imageUrl = `data:image/jpeg;base64,${buffer.toString('base64')}`
+        }
+      } catch (fbError) {
+        console.error('Firebase upload failed, falling back to base64', fbError)
+        imageUrl = `data:image/jpeg;base64,${buffer.toString('base64')}`
+      }
+
       await sql`
         INSERT INTO alerts (title, message, type, "read", image_url)
-        VALUES ('Unauthorized Entry Attempt', 'Vehicle plate detected: ' || ${detectedPlate}, 'security', false, ${base64Image})
+        VALUES ('Unauthorized Entry Attempt', 'Vehicle plate detected: ' || ${detectedPlate}, 'security', false, ${imageUrl})
       `
       return NextResponse.json({ 
         authorized: false, 
