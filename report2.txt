@@ -1,0 +1,29 @@
+Info: Processing symbol 'J1:Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical'.
+Info: Processing symbol 'J2:Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical'.
+Info: Processing symbol 'J3:Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical'.
+Info: Processing symbol 'J4:Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical'.
+Info: Processing symbol 'J5:Connector_BarrelJack:BarrelJack_CUI_PJ-102AH_Horizontal'.
+Info: Processing symbol 'LED1:LED_THT:LED_D5.0mm-4_RGB'.
+Info: Processing symbol 'LED2:LED_THT:LED_D5.0mm-4_RGB'.
+Info: Processing symbol 'LS1:Buzzer_Beeper:Buzzer_12x9.5RM7.6'.
+Info: Processing symbol 'M1:Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical'.
+Info: Processing symbol 'M2:Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical'.
+Info: Processing symbol 'R1:Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal'.
+Info: Processing symbol 'R2:Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal'.
+Info: Processing symbol 'R3:Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal'.
+Info: Processing symbol 'R4:Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal'.
+Info: Processing symbol 'R5:Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal'.
+Info: Processing symbol 'U1:pcbcupid_footprint:glyph-c6'.
+Info: Processing symbol 'U2:pcbcupid_footprint:esp32_cam'.
+Info: Total warnings: 3, errors: 3.
+
+
+Warning: No net found for component LED2 pad 3 (no pin 3 in symbol).
+Warning: No net found for component U2 pad 14 (no pin 14 in symbol).
+Warning: No net found for component U2 pad 15 (no pin 15 in symbol).
+Error: LED2 pad 5 not found in LED_THT:LED_D5.0mm-4_RGB.
+Error: U2 pad 14_ not found in pcbcupid_footprint:esp32_cam.
+Error: U2 pad 15_ not found in pcbcupid_footprint:esp32_cam.
+
+
+Info: Total warnings: 3, errors: 3.

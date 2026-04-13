@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "pcbcupid_footprint")(type "KiCad")(uri "C:/Users/anees/OneDrive/Documents/GitHub/pcbcupid-hardware-libraries/pcbcupid_footprint/pcbcupid_footprint.pretty")(options "")(descr ""))
+)

@@ -1,0 +1,7 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "pcbcupid")(type "KiCad")(uri "C:/Users/anees/OneDrive/Documents/GitHub/pcbcupid-hardware-libraries/pcbcupid_symbol/pcbcupid.kicad_sym")(options "")(descr ""))
+  (lib (name "4led")(type "KiCad")(uri "${KIPRJMOD}/New_Library.kicad_sym")(options "")(descr ""))
+  (lib (name "IR Sensor")(type "KiCad")(uri "${KIPRJMOD}/IR Sensor.kicad_sym")(options "")(descr ""))
+  (lib (name "Buzzer")(type "KiCad")(uri "${KIPRJMOD}/Buzzer.kicad_sym")(options "")(descr ""))
+)
